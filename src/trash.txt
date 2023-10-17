@@ -1,0 +1,71 @@
+ .body-style{
+        display: block;
+    }
+    .form-logo{
+        display: none;
+    }
+    .form-sign-in-superadmin{
+        padding: 0;
+        width: 100%;
+    }
+    .form-sign-in{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .form-sign-in-supreme-logo{
+        display:  block;
+        background-image: linear-gradient(to top, #11194e, #030512);
+        margin-top: 100px;
+    }
+  
+    .sign-in-text{
+        margin: 50px 0 50px 0;
+    }
+    .sign-in-input{
+        margin: 0;
+    }
+    .button-sign-in{
+        margin: 0;
+        margin-top:50px;
+        padding: 0;
+        width: 70.7vw;
+    }
+
+    .sign-in-input--style{
+        width: 60vw;
+        min-width: 300px;
+        border-radius: 6px;
+    }
+    .sign-in-input-box--styles{
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+    .text-box{
+        padding: 12px;
+        width: 100px;
+        text-align: center;
+        border-radius: 6px;
+        position: relative;
+        bottom: 2px
+    }
+    .email-box{
+        margin-bottom: 64px;
+    }
+    .passwod-eye{
+        margin: 0;
+    }
+    
+    .error-message{
+        position: relative;
+    }
+    #email-error-message{
+        bottom: 35px;
+    }
+    #password-error-message{
+        top: 30px;
+
+    }
