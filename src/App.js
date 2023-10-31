@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useRef }  from "react";
+import React, { useEffect, useState } from "react";
+import { Formik, Field, Form, ErrorMessage, useFormik } from 'formik';
+import * as Yup from 'yup';
 import supremeLogo from "./img/supreme-logo.svg"
 import waveTop from "./img/wave-top.svg"
 import waveBottom from "./img/wave-bottom.svg"
@@ -6,89 +8,51 @@ import picCigares from "./img/pic-cigares@3x.png"
 import "./css/logo.css"
 import Modal from "./Modal";
 
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Невірний формат пошти')
+    .required('Це поле пусте!'),
+  password: Yup.string()
+    .min(6, 'Довжина рядка не повинна бути менша 6 символів')
+    .max(20, 'Довжина рядка не повинна бути більшою 20 символів')
+    .required('Це поле пусте!'),
+});
+
 
 function App() {
-  
-  const ref = useRef(null);
-  const [inputValueEmail, setInputValueEmail] = useState('');
-  const [isInputEmailFocused, setIsInputEmailFocused] = useState(false);
-  const [isInputEmailFirstFocus, setIsInputEmailFirstFocus] = useState(0)
 
-  const [inputValuePassword, setInputValuePassword] = useState('');
-  const [isInputPasswordFocused, setIsInputPasswordFocused] = useState(false);
-  const [isInputPasswordFirstFocus, setIsInputPasswordFirstFocus] = useState(0);
+  const handleSubmit = (values, { setSubmitting }) => {
+    setModalWindow(true);
+    setSubmitting(false);
+  };
 
-  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-  
-  const [buttonVisibility, setbuttonVisibility] = useState({
-    visibility: "hidden"
-    }); 
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: ''
+    },
+    validationSchema: validationSchema,
+    onSubmit: handleSubmit
+  });
+
+  const [buttonVisibility, setButtonVisibility] = useState('hidden');
   const [eyeClass, setEyeClass] = useState("bi-closed-eye");
-  const [passwordInputType, setPasswordInputType] = useState("password");
   const [isEyeClicked, setIsEyeClicked] = useState(0);
   const [isEyeFirstClicked, setIsEyeFirstClicked] = useState(0);
+  const [passwordInputType, setPasswordInputType] = useState("password");
+  const [modalWindow, setModalWindow] = useState(false);
+  const [isFormFirstRun, setIsFormFirstRun] = useState(0);
 
-
-  const [emailErrorMessageStyle, setEmailErrorMessageStyle] = useState({});
-  const [emailErrorMessage, setEmailErrorMessage] = useState();
-  const [passwodErrorMessageStyle, setPasswordErrorMessageStyle] = useState({});
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState();
-
-
-  const [isEmailValid, setIsEmailValid] = useState(false);
-  const [isPasswordValid, setIsPasswordValid] = useState(false);
-  const [modalWindow, setModalWindow] = useState(false)
-
-  useEffect (() => {
-    setIsInputEmailFirstFocus(isInputEmailFirstFocus +1)
-    if (inputValueEmail){
-      if (emailPattern.test(inputValueEmail) === true){
-        setEmailErrorMessageStyle({display: "none"});
-        setIsEmailValid(true);
-      }
-      else{
-        setEmailErrorMessage("Невірний формат пошти");
-        setEmailErrorMessageStyle({display: "block"});
-        setIsEmailValid(false);
-      }
+  useEffect(() => {
+    setIsFormFirstRun(isFormFirstRun +1);
+    if (isFormFirstRun >= 2){
+      setButtonVisibility(formik.isValid ? 'visible' : 'hidden');
     }
-    else {
-      if (isInputEmailFirstFocus >= 2){
-      setEmailErrorMessage("Це поле пусте !");
-      setEmailErrorMessageStyle({display: "block"});
-      setIsEmailValid(false);
-    }
-  }
-  }, [isInputEmailFocused])
+    console.log(formik.touched.email)
+    console.log(formik.isValid)
+    console.log(isFormFirstRun)
 
-
-  useEffect (() => {
-    setIsInputPasswordFirstFocus(isInputPasswordFirstFocus +1)
-    if (inputValuePassword) {
-      if (inputValuePassword.length >= 6 && inputValuePassword.length <= 20){
-        setPasswordErrorMessageStyle({display: "none"}); 
-        setIsPasswordValid(true);
-      }
-      else if (inputValuePassword.length > 20){
-        setPasswordErrorMessageStyle({display: "block"}); 
-        setPasswordErrorMessage("Довжина рядка не повинна бути більшою 20 символів");
-        setIsPasswordValid(false);
-      }
-      else{
-        setPasswordErrorMessageStyle({display: "block"}); 
-        setPasswordErrorMessage("Довжина рядка не повинна бути меньша 6 символів");
-        setIsPasswordValid(false);
-      }
-    }
-    else {
-      if (isInputPasswordFirstFocus >= 2){
-      setPasswordErrorMessageStyle({display: "block"}); 
-      setPasswordErrorMessage("Це поле пусте !");
-      setIsPasswordValid(false);
-    }}
-  
-  }, [isInputPasswordFocused, inputValuePassword])
-
+  }, [formik.values.email, formik.values.password, formik.touched.email, formik.touched.password]);
 
   useEffect (() => {
     setIsEyeFirstClicked(isEyeFirstClicked +1)
@@ -103,56 +67,62 @@ function App() {
     }}
   }, [isEyeClicked])
 
-useEffect(() => {
-  if (isEmailValid && isPasswordValid){
-    setbuttonVisibility({visibility: "visible"})
-  }
-}, [isPasswordValid, isEmailValid])
-
   return (
     <div className="body-style">
-    <form className="form-sign-in-superadmin">
-        <div className="form-logo">
-          <img src={supremeLogo}  className="form-logo-supreme-logo supreme--logo"/>
-          <img src={waveTop} className="wave-top"/>
-          <img src={picCigares} className="pic-cigares"/>
-          <img src={waveBottom} className="wave-bottom"/>
-        </div>
-        <div className="form-sign-in">
-          <img src={supremeLogo}  className="form-sign-in-supreme-logo supreme--logo"/>
-          <p className="sign-in-text">Sign in</p>
-          <div className="sign-in-input">
-            <div className="email-box sign-in-input-box--styles sign-in-input--text-styles"> 
-              <label htmlFor="label-email" className="text-box">Email</label>
-              <input id="label-email" className="email-input sign-in-input--style" type="text" placeholder="Email"  
-              ref={ref}
-              onFocus={() => setIsInputEmailFocused(true)}
-              onBlur={() => setIsInputEmailFocused(false)}
-              onChange={(event) => setInputValueEmail(event.target.value)}
+      <Formik initialValues={{ email: '', password: '' }} validationSchema={validationSchema} onSubmit={handleSubmit}>
+        <Form className="form-sign-in-superadmin">
+          <div className="form-logo">
+            <img src={supremeLogo} className="form-logo-supreme-logo supreme--logo" alt="Supreme Logo" />
+            <img src={waveTop} className="wave-top" alt="Wave Top" />
+            <img src={picCigares} className="pic-cigares" alt="Cigares" />
+            <img src={waveBottom} className="wave-bottom" alt="Wave Bottom" />
+          </div>
+          <div className="form-sign-in">
+            <img src={supremeLogo} className="form-sign-in-supreme-logo supreme--logo" alt="Supreme Logo" />
+            <p className="sign-in-text">Sign in</p>
+            <div className="sign-in-input">
+              <div className="email-box sign-in-input-box--styles sign-in-input--text-styles">
+                <label htmlFor="label-email" className="text-box">Email</label>
+                <Field
+                  id="label-email"
+                  name="email"
+                  className="email-input sign-in-input--style"
+                  type="text"
+                  placeholder="Email"
+                  // onChange={formik.handleChange}
+                  //value={formik.values.email}
                 />
-            </div> 
-            <span id="email-error-message" className="error-message sign-in-input--text-styles" style={emailErrorMessageStyle}>{emailErrorMessage}</span>
-            <div className="passwod-box sign-in-input-box--styles sign-in-input--text-styles">
+              </div>
+              <ErrorMessage name="email" id="email-error-message" className="error-message sign-in-input--text-styles" component="span">
+                {formik.touched.email && formik.errors.email}
+              </ErrorMessage>
+              <div className="passwod-box sign-in-input-box--styles sign-in-input--text-styles">
                 <label htmlFor="label-password" className="text-box">Password</label>
                 <div className="input-eye">
-                  <input id="label-password" className="password-input sign-in-input--style" type={passwordInputType} placeholder="********"
-                   ref={ref}
-                   onFocus={() => setIsInputPasswordFocused(true)}
-                   onBlur={() => setIsInputPasswordFocused(false)}
-                   onChange={(event) => setInputValuePassword(event.target.value)}
-                   />
+                  <Field
+                    id="label-password"
+                    name="password"
+                    className="password-input sign-in-input--style"
+                    type={passwordInputType}
+                    placeholder="********"
+                    // onChange={formik.handleChange}
+                    //value={formik.values.password}
+                  />
                   <div className="passwod-eye">
                     <button type="button" id="eye-button" className={`bi bi--eye ${eyeClass}`} onClick={() => setIsEyeClicked(isEyeClicked +1)}></button>
                   </div>
                 </div>
+              </div>
+            <ErrorMessage name="password" id="password-error-message" className="error-message sign-in-input--text-styles" component="span">
+              {formik.touched.password && formik.errors.password}
+            </ErrorMessage>
             </div>
-            <span id="password-error-message" className="error-message sign-in-input--text-styles" style={passwodErrorMessageStyle}>{passwordErrorMessage}</span> 
+            <button type="submit" style={{ visibility: buttonVisibility }} className="button-sign-in">Sign in</button>
+            {modalWindow && <Modal setModalWindow={setModalWindow} email={formik.values.email} password={formik.values.password} />}
           </div>
-          <button type="button" style={buttonVisibility} className="button-sign-in" onClick={() => setModalWindow(true)}>Sign in</button>
-          {modalWindow && <Modal setModalWindow={setModalWindow} email={inputValueEmail} password={inputValuePassword} />}
-        </div>
-    </form>
-  </div>
+        </Form>
+      </Formik>
+    </div>
   );
 }
 
